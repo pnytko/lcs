@@ -1,0 +1,165 @@
+# ==========================================
+# LuloCustoms Shop - Apache .htaccess
+# ==========================================
+# UWAGA: Upload ten plik do głównego katalogu domeny
+# Wymaga mod_rewrite (zazwyczaj włączony na hostingu)
+# ==========================================
+
+# Enable rewrite engine
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+</IfModule>
+
+# ==========================================
+# FORCE HTTPS
+# ==========================================
+# Przekieruj HTTP → HTTPS (po wdrożeniu odkomentuj)
+
+# <IfModule mod_rewrite.c>
+#     RewriteCond %{HTTPS} off
+#     RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [L,R=301]
+# </IfModule>
+
+# ==========================================
+# SECURITY HEADERS
+# ==========================================
+
+<IfModule mod_headers.c>
+    # Prevent MIME type sniffing
+    Header set X-Content-Type-Options "nosniff"
+
+    # XSS Protection
+    Header set X-XSS-Protection "1; mode=block"
+
+    # Clickjacking protection
+    Header set X-Frame-Options "SAMEORIGIN"
+
+    # Referrer policy
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+
+    # Content Security Policy (dostosuj do swoich potrzeb)
+    # Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';"
+
+    # Strict Transport Security (HSTS) - tylko dla HTTPS!
+    # Odkomentuj po wdrożeniu SSL:
+    # Header set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+</IfModule>
+
+# ==========================================
+# BLOCK ACCESS TO SENSITIVE FILES
+# ==========================================
+
+# Block .env files
+<FilesMatch "^\.env">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Block .git directory
+<DirectoryMatch "\.git">
+    Order allow,deny
+    Deny from all
+</DirectoryMatch>
+
+# Block PHP config files
+<FilesMatch "^(config|database)\.php$">
+    Order allow,deny
+    Deny from all
+    # Zezwól tylko dla localhost (development)
+    # Allow from 127.0.0.1
+</FilesMatch>
+
+# Block backup files
+<FilesMatch "\.(bak|backup|old|sql|txt)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# ==========================================
+# PHP SETTINGS
+# ==========================================
+
+<IfModule mod_php.c>
+    # Disable PHP execution in uploads folder
+    php_flag engine off
+
+    # Hide PHP version
+    php_flag expose_php off
+
+    # Session settings
+    php_value session.cookie_httponly 1
+    php_value session.cookie_secure 1
+    php_value session.use_strict_mode 1
+
+    # File upload limits (dostosuj do potrzeb)
+    php_value upload_max_filesize 10M
+    php_value post_max_size 10M
+    php_value max_execution_time 30
+</IfModule>
+
+# ==========================================
+# DISABLE DIRECTORY LISTING
+# ==========================================
+
+Options -Indexes
+
+# ==========================================
+# CUSTOM ERROR PAGES (opcjonalnie)
+# ==========================================
+
+# ErrorDocument 404 /404.html
+# ErrorDocument 403 /403.html
+# ErrorDocument 500 /500.html
+
+# ==========================================
+# COMPRESSION (opcjonalnie - lepsze performance)
+# ==========================================
+
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json application/xml
+</IfModule>
+
+# ==========================================
+# CACHING (opcjonalnie)
+# ==========================================
+
+<IfModule mod_expires.c>
+    ExpiresActive On
+
+    # Images
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+
+    # CSS and JavaScript
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+
+    # Fonts
+    ExpiresByType font/woff "access plus 1 year"
+    ExpiresByType font/woff2 "access plus 1 year"
+</IfModule>
+
+# ==========================================
+# DISABLE PHP IN UPLOADS DIRECTORY
+# ==========================================
+
+<Directory "uploads">
+    <FilesMatch "\.php$">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
+</Directory>
+
+# ==========================================
+# API ROUTING (jeśli potrzebne)
+# ==========================================
+
+# Jeśli chcesz pretty URLs dla API, np. /api/products zamiast /api/products.php
+# <IfModule mod_rewrite.c>
+#     RewriteRule ^api/products$ api/products.php [L]
+#     RewriteRule ^api/orders$ api/orders.php [L]
+#     RewriteRule ^api/payment$ api/payment.php [L]
+#     RewriteRule ^api/auth$ api/auth.php [L]
+# </IfModule>

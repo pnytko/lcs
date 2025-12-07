@@ -201,7 +201,7 @@ order_items:
 ## Plan realizacji (23 kroki)
 
 ### ETAP 1: BAZA DANYCH (3 kroki)
-1. [ ] **Utworzyć schemat bazy MySQL** (`database/schema.sql`)
+1. [x] **Utworzyć schemat bazy MySQL** (`database/schema.sql`)
    - 4 tabele: admin_users, products, orders, order_items
    - Indeksy, foreign keys, defaults
 2. [ ] **Napisać skrypt seed** (`database/seed.sql`)
